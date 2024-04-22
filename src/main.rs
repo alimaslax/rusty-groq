@@ -1,6 +1,6 @@
-use std::{env, io};
-use dialoguer::{theme::ColorfulTheme, Select};
-use serde_json::{json, Value};
+use std::{ env, io };
+use dialoguer::{ theme::ColorfulTheme, Select };
+use serde_json::{ json, Value };
 use reqwest::Client;
 
 #[tokio::main]
@@ -13,7 +13,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Enter your prompt:");
     io::stdin().read_line(&mut prompt)?;
 
-    let request_body = json!({
+    let request_body =
+        json!({
         "messages": [
             {
                 "role": "system",
@@ -77,7 +78,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
 
     match selection {
-        Some(index) => println!("You selected: {}", choices_strings[index]),
+        Some(index) => {
+            println!("You selected: {}", choices_strings[index]);
+            std::process::Command
+                ::new("sh")
+                .arg("-c")
+                // executed selected
+                .arg(choices_strings[index])
+                .status()
+                .unwrap();
+        }
         None => println!("You didn't select anything!"),
     }
 
