@@ -1,18 +1,7 @@
-use std::env;
-use std::io;
-use crossterm::style::Attribute;
-use crossterm::style::Color;
-use crossterm::style::StyledContent;
-use crossterm::style::Stylize;
-use crossterm::terminal;
-use serde_json::{ json, Value };
-use crossterm::{
-    cursor::{ self, MoveToColumn },
-    event::{ self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers },
-    execute,
-    terminal::ClearType,
-    style::PrintStyledContent,
-};
+use std::{env, io};
+use dialoguer::{theme::ColorfulTheme, Select};
+use serde_json::{json, Value};
+use reqwest::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -24,8 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Enter your prompt:");
     io::stdin().read_line(&mut prompt)?;
 
-    let request_body =
-        json!({
+    let request_body = json!({
         "messages": [
             {
                 "role": "system",
@@ -55,7 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "model": "llama3-70b-8192"
     });
 
-    let client = reqwest::Client::new();
+    let client = Client::new();
 
     let res = client
         .post(url)
@@ -70,72 +58,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("JSON Response: {:#?}", res);
 
-    let choices = res["choices"].as_array().unwrap();
+    let choices: &Vec<Value> = res["choices"].as_array().unwrap();
 
-    // Clear the terminal
-    execute!(std::io::stdout(), terminal::Clear(ClearType::All))?;
+    let choices_strings: Vec<_> = choices
+        .iter()
+        .map(|choice| {
+            let content = choice["message"]["content"].as_str().unwrap();
+            content.split("\n").collect::<Vec<_>>()
+        })
+        .flatten()
+        .collect();
 
-    // Move the cursor to the top left
-    execute!(std::io::stdout(), cursor::MoveToColumn(1))?;
+    let selection = Select::with_theme(&ColorfulTheme::default())
+        .with_prompt("Select a choice")
+        .default(0) // This will default to the first choice
+        .items(&choices_strings)
+        .interact_opt()
+        .unwrap();
 
-    // Print the choices
-
-    // Print the choices
-    for (i, choice) in choices.iter().enumerate() {
-        let content = choice["message"]["content"].as_str().unwrap();
-        let lines = content.split("\n");
-        for (j, line) in lines.enumerate() {
-            let styled = line.with(Color::Yellow).on(Color::Blue).attribute(Attribute::Bold);
-            execute!(std::io::stdout(), PrintStyledContent(styled))?;
-        }
+    match selection {
+        Some(index) => println!("You selected: {}", choices_strings[index]),
+        None => println!("You didn't select anything!"),
     }
-
-    // Enable mouse capture
-    execute!(std::io::stdout(), EnableMouseCapture)?;
-
-    // Get the selected choice
-    let mut selected = 0;
-    loop {
-        if let Event::Key(event) = event::read()? {
-            match (event.code, event.modifiers) {
-                (KeyCode::Up, KeyModifiers::NONE) => {
-                    selected = ((selected as i32) - 1).max(0) as usize;
-                }
-                (KeyCode::Down, KeyModifiers::NONE) => {
-                    selected = ((selected as i32) + 1).min((choices.len() as i32) - 1) as usize;
-                }
-                (KeyCode::Enter, KeyModifiers::NONE) => {
-                    break;
-                }
-                _ => (),
-            }
-        }
-        // Move the cursor to the selected choice
-        execute!(std::io::stdout(), cursor::MoveToColumn(1), cursor::MoveDown(selected as u16))?;
-        // Print the selected choice
-        execute!(
-            std::io::stdout(),
-            PrintStyledContent(
-                choices[selected]["message"]["content"]
-                    .as_str()
-                    .unwrap()
-                    .with(Color::Yellow)
-                    .on(Color::Blue)
-                    .attribute(Attribute::Bold)
-            )
-        )?;
-        // Disable mouse capture
-        execute!(std::io::stdout(), DisableMouseCapture)?;
-    }
-
-    // Clear the terminal
-    execute!(std::io::stdout(), terminal::Clear(ClearType::All))?;
-
-    // Print the selected choice
-    println!("You selected: {}", choices[selected]["message"]["content"].as_str().unwrap());
-
-    // Reset the terminal to its default state
-    execute!(std::io::stdout(), terminal::LeaveAlternateScreen)?;
 
     Ok(())
 }
