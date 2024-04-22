@@ -1,0 +1,15 @@
+[package]
+name = "q-command"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reqwest = "0.11.10"
+serde_json = "1.0.68"
+tokio = { version = "1.24.2", features = ["full"] }
+dialoguer = "0.11.0"
+serde = { version = "1.0", features = ["derive"] }
+
+[[bin]]
+name = "q"
+path = "q.rs"

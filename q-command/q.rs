@@ -37,11 +37,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "messages": [
             {
                 "role": "system",
-                "content": "Valid MacOSX bash scripts only. Assume user has needed commands. DO NOT give any expected outputs, or additional text that will make it invalid cli call \n
-                Use the reference below:
-                    Q: prep one-app for me. A: cd ~/dev/one-app/apps/universal && yarn && yarn prebuild && open ios/NetJetsDEV.xcworkspace\n
-                    Q: go home and do a git status. A: cd ~/ && git status\n
-                    Q: go to dev one-ap. A: cd ~/dev/one-app/apps/universal && cd ~/dev/one-app\n"
+                "content": "Valid MacOSX bash scripts only. Assume user has needed commands. DO NOT give any expected outputs, or additional text that will make it invalid cli call"
+            },
+            {
+                "role": "user",
+                "content": "go to dev one-app"
+            },
+            {
+                "role": "system",
+                "content": "cd ~/dev/one-app"
+            },
+            {
+                "role": "user",
+                "content": "go home and do a git status"
+            },
+            {
+                "role": "system",
+                "content": "cd ~/ && git status"
             },
             {
                 "role": "user",
