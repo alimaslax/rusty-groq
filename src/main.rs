@@ -50,7 +50,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     let current_dir = env::current_dir().unwrap();
     let json_path = current_dir.join("src/prompts/bash-cli.json");
-    println!("json_path: {:?}", json_path);
     let json_string = read_to_string(json_path).expect("Failed to read file");
     let mut request_body: RequestBody = serde_json::from_str(&json_string).unwrap();
 
