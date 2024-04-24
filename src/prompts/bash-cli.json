@@ -2,12 +2,24 @@
   "messages": [
     {
       "role": "system",
-      "content": "Valid MacOSX bash scripts only. Assume user has needed commands. DO NOT give any expected outputs, or additional text that will make it invalid cli call Use the reference below: Q: prep one-app for me. A: cd ~/dev/one-app/apps/universal && yarn && yarn prebuild && open ios/NetJetsDEV.xcworkspace\n Q: go home and do a git status. A: cd ~/ && git status\n Q: go to dev one-ap. A: cd ~/dev/one-app/apps/universal && cd ~/dev/one-app\n"
+      "content": "Valid single-line MacOSX bash script only. Assume user has needed commands. DO NOT give any expected outputs, or additional text that will make an invalid bash cli call.\nUse this reference for example. Q: prep one-app for me. A: cd ~/dev/one-app/apps/universal && yarn && yarn prebuild && open ios/NetJetsDEV.xcworkspace\nQ: go home and do a git status. A: cd ~/ && git status\nQ: go to dev one-app. A: cd ~/dev/one-app/apps/universal && cd ~/dev/one-app\nQ: run op-be4fe. A: cd ~/dev/op-be4fe/ && dotnet run\nQ: run dotnet for me. A: cd ~/dev/op-be4fe/ && dotnet run\n"
     },
     {
       "role": "user",
-      "content": ""
+      "content": "fetch flydev version"
+    },
+    {
+      "role": "assistant",
+      "content": "curl -s https://flydev.netjets.com/api/diagnostics/version | jq ."
+    },
+    {
+      "role": "user",
+      "content": "go home and do a git status"
+    },
+    {
+      "role": "assistant",
+      "content": "cd ~/ && git status"
     }
   ],
-  "model": "llama3:8b"
+  "model": "phi3:3.8b-mini-instruct-4k-q4_K_M"
 }
