@@ -46,8 +46,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if let Some(file_path) = file_path {
         prompt = read_to_string(file_path)?;
+        prompt = format!("[FILE] {}", prompt.trim());
     }
-
     let current_dir = env::current_dir().unwrap();
     let json_path = current_dir.join("src/prompts/bash-cli.json");
     println!("json_path: {:?}", json_path);
@@ -76,8 +76,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     while let Ok(response) = Response::deserialize(&mut deserializer) {
         responses.push(response);
     }
-
-    if file_path.is_none() {
+    if let Some(_) = file_path {
+        for response in responses {
+            print!("{}", response.message.content);
+        }
+    } else {
         let choices_strings: Vec<_> = responses
             .iter()
             .map(|response| response.message.content.to_string())
@@ -110,10 +113,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .unwrap();
             }
             None => println!("You didn't select anything!"),
-        }
-    } else {
-        for response in responses {
-            println!("{}", response.message.content);
         }
     }
 
