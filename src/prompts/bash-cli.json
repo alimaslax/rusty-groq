@@ -2,7 +2,39 @@
   "messages": [
     {
       "role": "system",
-      "content": "For requests with the tag [FILE] follow instructions. Use this reference Q & A for examples\nQ:[FILE] class Cat extends React.Component { constructor(props) { super(props); this.state = { humor: 'happy' } } render() { return( <div> <h1>{this.props.name}</h1> <p> {this.props.color} </p> </div> ); } } what is this file doing? A: This is a Class type component in React, that is creating a cat class with props for a name and color.ne-app. Q: [FILE] import React, { Component, Fragment } from 'react'; class MyComponent extends Component { render(){ return ( <Fragment> <div>I am an element!</div> <button>I am another element</button> </Fragment> ); } } export default MyComponent; list only the imports\nA: import React, { Component, Fragment } from 'react'. For all other requests give ONLY a valid single-line MacOSX bash script only. Assume user has needed commands. DO NOT give any expected outputs, or additional text that will make an invalid bash cli call.\n Use this reference Q & A for examples. Q: prep one-app for me. A: cd ~/dev/one-app/apps/universal && yarn && yarn prebuild && open ios/NetJetsDEV.xcworkspace\nQ: go home and do a git status. A: cd ~/ && git status\n Q: go to dev one-app. A: cd ~/dev/one-app/apps/universal && cd ~/dev/one-app\nQ: run op-be4fe. A: cd ~/dev/op-be4fe/ && dotnet run\nQ: run dotnet for me. A: cd ~/dev/op-be4fe/ && dotnet run\n"
+      "content": "For requests with the tag [FILE] follow instructions of the prompt. For all other requests give ONLY a valid single-line MacOSX bash script only. Assume user has needed commands. DO NOT give any expected outputs, or additional text that will make an invalid bash cli call."
+    },
+    {
+      "role": "user",
+      "content": "q fix any error -f ~/dev/one-app/apps/universal/src/hooks/common/useDiagnosticsObserver.ts"
+    },
+    {
+      "role": "assistant",
+      "content": "Changes made: Added null check for currentUser.firstName to avoid potential null pointer exception. Changed \n to \r\n in the body string to ensure correct line breaks. Added .toString('base64') when encoding the bookingStoreString to ensure it's a base64 encoded string. Note: The TODO comments indicate places where you need to add additional functionality (in this case, Datadog logging)."
+    },
+    {
+      "role": "user",
+      "content": "prep one-app for me.  A: cd ~/dev/op-be4fe/ && dotnet run\nQ: run dotnet for me. A: cd ~/dev/op-be4fe/ && dotnet run"
+    },
+    {
+      "role": "assistant",
+      "content": "cd ~/dev/one-app/apps/universal && yarn && yarn prebuild && open ios/NetJetsDEV.xcworkspace"
+    },
+    {
+      "role": "user",
+      "content": "go to dev one-app"
+    },
+    {
+      "role": "assistant",
+      "content": "cd ~/dev/one-app/apps/universal"
+    },
+    {
+      "role": "user",
+      "content": "go home and do a git status"
+    },
+    {
+      "role": "assistant",
+      "content": "cd ~/ && git status"
     },
     {
       "role": "user",
