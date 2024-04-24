@@ -4,6 +4,7 @@ groq api cli
 
 ```bash
 export groq-api=
+alias q='cargo run --'
 ```
 
 To turn this Rust program into a brew install, you'll need to create a Homebrew formula for it. Here's a step-by-step guide:

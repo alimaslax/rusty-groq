@@ -1,9 +1,9 @@
-use dialoguer::{theme::ColorfulTheme, Select};
+use dialoguer::{ theme::ColorfulTheme, Select };
 use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
 
-use std::env::{self};
+use std::env::{ self };
 use std::process::Command;
 
 #[derive(Deserialize, Debug)]
@@ -27,39 +27,53 @@ struct Message {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    //let api_key = env::var("GROQ_API").expect("Please set the GROQ_API environment variable");
-
     let url = "http://localhost:11434/api/chat";
     let args: Vec<String> = env::args().collect();
     let prompt = args[1..].join(" ");
 
-    let request_body = json!({
+    let request_body =
+        json!({
         "messages": [
             {
                 "role": "system",
-                "content": "Valid MacOSX bash scripts only. Assume user has needed commands. DO NOT give any expected outputs, or additional text that will make it invalid cli call \n
-                Use the reference below:
-                    Q: prep one-app for me. A: cd ~/dev/one-app/apps/universal && yarn && yarn prebuild && open ios/NetJetsDEV.xcworkspace\n
-                    Q: go home and do a git status. A: cd ~/ && git status\n
-                    Q: go to dev one-ap. A: cd ~/dev/one-app/apps/universal && cd ~/dev/one-app\n"
+                "content": "Valid single-line MacOSX bash script only. Assume user has needed commands. DO NOT give any expected outputs, or additional text that will make an invalid bash cli call.\n
+                Use this reference for example. Q: prep one-app for me. A: cd ~/dev/one-app/apps/universal && yarn && yarn prebuild && open ios/NetJetsDEV.xcworkspace\nQ: go home and do a git status. A: cd ~/ && git status\n
+                Q: go to dev one-app. A: cd ~/dev/one-app/apps/universal && cd ~/dev/one-app\nQ: run op-be4fe. A: cd ~/dev/op-be4fe/ && dotnet run\nQ: run dotnet for me. A: cd ~/dev/op-be4fe/ && dotnet run\n"
+            },
+            {
+                "role": "user",
+                "content": "fetch flydev version"
+            },
+            {
+                "role": "assistant",
+                "content": "curl -s https://flydev.netjets.com/api/diagnostics/version | jq ."
+            },
+            {
+                "role": "user",
+                "content": "go home and do a git status"
+            },
+            {
+                "role": "assistant",
+                "content": "cd ~/ && git status"
             },
             {
                 "role": "user",
                 "content": prompt.trim()
             },
         ],
-        "model": "llama3:8b"
+        "model": "phi3:3.8b-mini-instruct-4k-q4_K_M"
     });
 
     let client = Client::new();
+
+    // create another client object
 
     let res = client
         .post(url)
         //.header("Authorization", format!("Bearer {}", api_key))
         .header("Content-Type", "application/json")
         .body(serde_json::to_string(&request_body)?)
-        .send()
-        .await?;
+        .send().await?;
 
     let res_text = res.text().await?;
 
@@ -70,8 +84,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     while let Ok(response) = Response::deserialize(&mut deserializer) {
         responses.push(response);
     }
-
-    println!("JSON Responses: {:#?}", responses);
 
     let choices_strings: Vec<_> = responses
         .iter()
